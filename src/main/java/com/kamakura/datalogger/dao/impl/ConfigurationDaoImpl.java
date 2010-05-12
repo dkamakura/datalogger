@@ -44,10 +44,10 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
 	private String configurationToData(DataLoggerConfiguration dataLoggerConfiguration) {
 		StringBuilder message = new StringBuilder();
 		message.append(serialNumberFormatter.format(dataLoggerConfiguration.getSerialNumber()));
-		message.append(temperatureFormatter.format(dataLoggerConfiguration.getCalibrationTemperature().doubleValue()));
 		message.append(sampleIntervalFormatter.format(dataLoggerConfiguration.getSampleInterval()));
 		message.append(temperatureFormatter.format(dataLoggerConfiguration.getAlarmMinTemperature().doubleValue()));
 		message.append(temperatureFormatter.format(dataLoggerConfiguration.getAlarmMaxTemperature().doubleValue()));
+		message.append(temperatureFormatter.format(dataLoggerConfiguration.getCalibrationTemperature().doubleValue()));
 		String messageLRC = DataLoggerUtil.addLRC(message.toString()); 
 		return messageLRC;
 	}

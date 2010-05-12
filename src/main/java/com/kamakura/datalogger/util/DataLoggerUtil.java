@@ -18,4 +18,9 @@ public class DataLoggerUtil {
 	public static String addLRC(String str) {
 		return str + DataLoggerUtil.calculateLRC(str);
 	}
+	
+	public static void main(String[] args) {
+		char t = DataLoggerUtil.calculateLRC("12345678901234510000123.12456.34789.56");
+		System.out.println((int)t);
+	}
 }
