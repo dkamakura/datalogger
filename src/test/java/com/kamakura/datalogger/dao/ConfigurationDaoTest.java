@@ -32,9 +32,9 @@ public class ConfigurationDaoTest {
 	public void testWriteConfiguration() {
 		
 		mockery.checking(new Expectations() {{
-            one(serialPortCommunicator).write("SCS12345678901234510000123.12456.34789.56" + (char)25 + "ECS");
+            one(serialPortCommunicator).write(ConfigurationDao.START_CONFIGURE_SIGNAL + "12345678901234510000123.12456.34789.56" + (char)25 + ConfigurationDao.END_CONFIGURE_SIGNAL);
             one(serialPortCommunicator).read();
-            will(returnValue("ACS"));
+            will(returnValue(ConfigurationDao.ACK_CONFIGURE_SIGNAL));
         }});
 		
 		ReflectionTestUtils.setField(configurationDao, "serialPortCommunicator", serialPortCommunicator);
@@ -54,7 +54,7 @@ public class ConfigurationDaoTest {
 	public void testWriteConfigurationNoAck() {
 		
 		mockery.checking(new Expectations() {{
-            one(serialPortCommunicator).write("SCS12345678901234510000123.12456.34789.56" + (char)25 + "ECS");
+            one(serialPortCommunicator).write(ConfigurationDao.START_CONFIGURE_SIGNAL + "12345678901234510000123.12456.34789.56" + (char)25 + ConfigurationDao.END_CONFIGURE_SIGNAL);
             one(serialPortCommunicator).read();
         }});
 		

@@ -14,11 +14,6 @@ import com.kamakura.datalogger.util.DataLoggerUtil;
 
 @Repository
 public class ConfigurationDaoImpl implements ConfigurationDao {
-	public static final String START_CONFIGURE_SIGNAL = "SCS";
-
-	public static final String END_CONFIGURE_SIGNAL = "ECS";
-
-	public static final String ACK_CONFIGURE_SIGNAL = "ACS";
 
     private static final NumberFormat temperatureFormatter = new DecimalFormat("000.00");
 

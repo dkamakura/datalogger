@@ -17,6 +17,7 @@ import com.kamakura.communication.SerialPortCommunicator;
 import com.kamakura.datalogger.dao.DataLogDao;
 import com.kamakura.datalogger.exception.DataLoggerException;
 import com.kamakura.datalogger.model.DataLog;
+import com.kamakura.datalogger.util.DataLoggerUtil;
 
 @Repository
 public class DataLogDaoImpl implements DataLogDao {
@@ -26,15 +27,15 @@ public class DataLogDaoImpl implements DataLogDao {
 	
 	/*
 	 * Serial Number: position 1 - size 15
-	 * Calibration Temperature: position 2 - size 3.2
-	 * Sample Interval: position 3 - size 5
-	 * Minimum Temperature: position 4 - size 3.2
-	 * Maximum Temperature: position 5 - size 3.2
+	 * Sample Interval: position 2 - size 5
+	 * Minimum Temperature: position 3 - size 3.2
+	 * Maximum Temperature: position 4 - size 3.2
+	 * Calibration Temperature: position 5 - size 3.2
 	 * Initial Read Time: position 6 - size 14 (yyyyMMddhhmiss)
 	 * Final Read Time: position 7 - size 14 (yyyyMMddhhmiss)
 	 * Samples: position 8 - size variable
 	 */
-	private static final Pattern dataPattern = Pattern.compile("(\\d{15})(\\d{3}\\.\\d{2})(\\d{5})(\\d{3}\\.\\d{2})(\\d{3}\\.\\d{2})(\\d{14})(\\d{14})(.*)");
+	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{3}\\.\\d{2})(-?\\d{3}\\.\\d{2})(-?\\d{3}\\.\\d{2})(\\d{14})(\\d{14})((-?\\d{3}\\.\\d{2})*))(.*)" + END_DATA_SIGNAL);
 
 	private static final Pattern samplesPattern = Pattern.compile("(-?\\d{3}\\.\\d{2})(.*)");
 
@@ -44,25 +45,34 @@ public class DataLogDaoImpl implements DataLogDao {
 	public DataLog readDataLog() {
 		DataLog dataLog = null;
 		
+		serialPortCommunicator.write(START_DATA_SIGNAL);
+
 		String data = serialPortCommunicator.read();
-		if(data != null) {
+		if(data != null && !data.equals("")) {
 			Matcher dataMatcher = dataPattern.matcher(data);
 		    
 		    if (dataMatcher.find()) {
+		    	String fullData = dataMatcher.group(1);
+		    	char dataLrc = dataMatcher.group(11).toCharArray()[0];
+		    	
+		    	if(dataLrc != DataLoggerUtil.calculateLRC(fullData)) {
+		    		throw new DataLoggerException("error.corrupted.data");
+		    	}
+		    	
 				dataLog = new DataLog();
-		    	dataLog.setSerialNumber(new Long(dataMatcher.group(1))); 
-		    	dataLog.setCalibrationTemperature(new BigDecimal(dataMatcher.group(2))); 
+		    	dataLog.setSerialNumber(new Long(dataMatcher.group(2))); 
 		    	dataLog.setSampleInterval(new Integer(dataMatcher.group(3))); 
 		    	dataLog.setAlarmMinTemperature(new BigDecimal(dataMatcher.group(4))); 
 		    	dataLog.setAlarmMaxTemperature(new BigDecimal(dataMatcher.group(5)));
+		    	dataLog.setCalibrationTemperature(new BigDecimal(dataMatcher.group(6))); 
 
 		    	try {
-		    		dataLog.setInitialReadTime(dateFormatter.parse(dataMatcher.group(6)));
+		    		dataLog.setInitialReadTime(dateFormatter.parse(dataMatcher.group(7)));
 		    	} catch(ParseException ex) {
 		    		throw new DataLoggerException("error.parsing.initial.date");
 		    	}
 		    	try {
-			    	dataLog.setFinalReadTime(dateFormatter.parse(dataMatcher.group(7))); 
+			    	dataLog.setFinalReadTime(dateFormatter.parse(dataMatcher.group(8))); 
 		    	} catch(ParseException ex) {
 		    		throw new RuntimeException("error.parsing.final.date");
 		    	}
@@ -70,7 +80,7 @@ public class DataLogDaoImpl implements DataLogDao {
 		    	Calendar calendar = GregorianCalendar.getInstance();
 		    	calendar.setTime(dataLog.getInitialReadTime());
 		    	
-		    	String samples = dataMatcher.group(8);
+		    	String samples = dataMatcher.group(9);
 				BigDecimal sum = new BigDecimal(0);
 		    	boolean match = false;
 		    	do {
@@ -107,10 +117,16 @@ public class DataLogDaoImpl implements DataLogDao {
 					for(BigDecimal sample : dataLog.getSamples().values()) {
 						variance = variance.add(sample.subtract(dataLog.getAverageTemperature()).pow(2));
 					}
-					variance = variance.divide(new BigDecimal(dataLog.getSamples().values().size() - 1), 2, RoundingMode.HALF_UP);
+					if(dataLog.getSamples().values().size() > 1) {
+						variance = variance.divide(new BigDecimal(dataLog.getSamples().values().size() - 1), 2, RoundingMode.HALF_UP);
+					}
 					// There is no sqtr in BigDecimal watch for precision issues
 					dataLog.setStandardDeviation(new BigDecimal(Math.sqrt(variance.doubleValue())).setScale(2, RoundingMode.HALF_UP));
+		    	} else {
+		    		throw new DataLoggerException("error.no.samples.returned");
 		    	}
+		    } else {
+	    		throw new DataLoggerException("error.invalid.data");
 		    }
 		}
 
