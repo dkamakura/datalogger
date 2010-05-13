@@ -1,6 +1,7 @@
 package com.kamakura.datalogger.dao.impl;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,11 @@ import com.kamakura.datalogger.util.DataLoggerUtil;
 @Repository
 public class ConfigurationDaoImpl implements ConfigurationDao {
 
-    private static final NumberFormat temperatureFormatter = new DecimalFormat("000.00");
+    private static final NumberFormat temperatureFormatter = new DecimalFormat("000.00") {{
+    	DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
+    	decimalFormatSymbols.setDecimalSeparator('.');
+    	setDecimalFormatSymbols(decimalFormatSymbols);
+    }};
 
     private static final NumberFormat serialNumberFormatter = new DecimalFormat("000000000000000");
 
