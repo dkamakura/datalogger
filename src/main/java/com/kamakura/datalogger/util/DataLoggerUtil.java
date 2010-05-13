@@ -5,6 +5,10 @@
  */
 package com.kamakura.datalogger.util;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class DataLoggerUtil {
 	public static char calculateLRC(String str) {
 		char lrc = 0;
@@ -20,7 +24,7 @@ public class DataLoggerUtil {
 	}
 	
 	public static void main(String[] args) {
-		char t = DataLoggerUtil.calculateLRC("12345678901234500100123.12456.34789.562009120614020220091225120000789.56");
+		char t = DataLoggerUtil.calculateLRC("12345678901234500100123.12456.34789.562009120614020220091225120000");
 		System.out.println((int)t);
 	}
 }

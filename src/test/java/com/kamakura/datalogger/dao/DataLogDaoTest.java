@@ -3,11 +3,8 @@ package com.kamakura.datalogger.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -36,8 +33,6 @@ public class DataLogDaoTest {
 
 	private SerialPortCommunicator serialPortCommunicator = mockery.mock(SerialPortCommunicator.class);
 
-	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddhhmmss");
-
 	@Test
 	public void testReadDataLog() {
 		mockery.checking(new Expectations() {
@@ -58,42 +53,19 @@ public class DataLogDaoTest {
 		assertEquals(new BigDecimal("123.12"), dataLog.getAlarmMinTemperature());
 		assertEquals(new BigDecimal("456.34"), dataLog.getAlarmMaxTemperature());
 		assertEquals(new BigDecimal("789.56"), dataLog.getCalibrationTemperature());
-
-		try {
-			assertEquals(dateFormatter.parse("20091206140202"), dataLog.getInitialReadTime());
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
-		try {
-			assertEquals(dateFormatter.parse("20091225120000"), dataLog.getFinalReadTime());
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
+		assertEquals("Sun Dec 06 14:02:02 BRST 2009", dataLog.getInitialReadTime().toString());
+		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
 
 		Calendar calendar = GregorianCalendar.getInstance();
-		try {
-			calendar.setTime(dateFormatter.parse("20091206140202"));
-		} catch (Exception ex) {
-			fail(ex.toString());
+		calendar.setTime(dataLog.getInitialReadTime());
+
+		for(Date date : dataLog.getSamples().keySet()) {
+			assertEquals(calendar.getTime(), date);
+			calendar.add(Calendar.MINUTE, new Integer("100"));
 		}
-
-		Date[] dates = dataLog.getSamples().keySet().toArray(new Date[0]);
-		assertEquals(calendar.getTime(), dates[0]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[1]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[2]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[3]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[4]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[5]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[6]);
-
+		
 		BigDecimal[] values = dataLog.getSamples().values().toArray(new BigDecimal[0]);
 		assertEquals(new BigDecimal("789.56"), values[0]);
 		assertEquals(new BigDecimal("123.12"), values[1]);
@@ -136,41 +108,18 @@ public class DataLogDaoTest {
 		assertEquals(new BigDecimal("-123.12"), dataLog.getAlarmMinTemperature());
 		assertEquals(new BigDecimal("-456.34"), dataLog.getAlarmMaxTemperature());
 		assertEquals(new BigDecimal("-789.56"), dataLog.getCalibrationTemperature());
-
-		try {
-			assertEquals(dateFormatter.parse("20091206140202"), dataLog.getInitialReadTime());
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
-		try {
-			assertEquals(dateFormatter.parse("20091225120000"), dataLog.getFinalReadTime());
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
+		assertEquals("Sun Dec 06 14:02:02 BRST 2009", dataLog.getInitialReadTime().toString());
+		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
 
 		Calendar calendar = GregorianCalendar.getInstance();
-		try {
-			calendar.setTime(dateFormatter.parse("20091206140202"));
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
+		calendar.setTime(dataLog.getInitialReadTime());
 
-		Date[] dates = dataLog.getSamples().keySet().toArray(new Date[0]);
-		assertEquals(calendar.getTime(), dates[0]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[1]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[2]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[3]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[4]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[5]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
-		assertEquals(calendar.getTime(), dates[6]);
+		for(Date date : dataLog.getSamples().keySet()) {
+			assertEquals(calendar.getTime(), date);
+			calendar.add(Calendar.MINUTE, new Integer("100"));
+		}
 
 		BigDecimal[] values = dataLog.getSamples().values().toArray(new BigDecimal[0]);
 		assertEquals(new BigDecimal("-789.56"), values[0]);
@@ -321,7 +270,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100123.12456.34789.562009120614020220091232120000" + (char)24 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("12345678901234500100123.12456.34789.562009120614020220091225120000" + (char)30 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -356,30 +305,18 @@ public class DataLogDaoTest {
 		assertEquals(new BigDecimal("123.12"), dataLog.getAlarmMinTemperature());
 		assertEquals(new BigDecimal("456.34"), dataLog.getAlarmMaxTemperature());
 		assertEquals(new BigDecimal("789.56"), dataLog.getCalibrationTemperature());
-
-		try {
-			assertEquals(dateFormatter.parse("20091206140202"), dataLog.getInitialReadTime());
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
-		try {
-			assertEquals(dateFormatter.parse("20091225120000"), dataLog.getFinalReadTime());
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
+		assertEquals("Sun Dec 06 14:02:02 BRST 2009", dataLog.getInitialReadTime().toString());
+		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
 
 		Calendar calendar = GregorianCalendar.getInstance();
-		try {
-			calendar.setTime(dateFormatter.parse("20091206140202"));
-		} catch (Exception ex) {
-			fail(ex.toString());
-		}
+		calendar.setTime(dataLog.getInitialReadTime());
 
-		Date[] dates = dataLog.getSamples().keySet().toArray(new Date[0]);
-		assertEquals(calendar.getTime(), dates[0]);
-		calendar.add(Calendar.MINUTE, new Integer("100"));
+		for(Date date : dataLog.getSamples().keySet()) {
+			assertEquals(calendar.getTime(), date);
+			calendar.add(Calendar.MINUTE, new Integer("100"));
+		}
 
 		BigDecimal[] values = dataLog.getSamples().values().toArray(new BigDecimal[0]);
 		assertEquals(new BigDecimal("789.56"), values[0]);

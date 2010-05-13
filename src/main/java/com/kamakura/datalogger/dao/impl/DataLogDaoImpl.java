@@ -39,7 +39,9 @@ public class DataLogDaoImpl implements DataLogDao {
 
 	private static final Pattern samplesPattern = Pattern.compile("(-?\\d{3}\\.\\d{2})(.*)");
 
-	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddhhmmss");
+	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmmss") {{
+		setLenient(false);
+	}};
 
 	@Override
 	public DataLog readDataLog() {
@@ -74,7 +76,7 @@ public class DataLogDaoImpl implements DataLogDao {
 		    	try {
 			    	dataLog.setFinalReadTime(dateFormatter.parse(dataMatcher.group(8))); 
 		    	} catch(ParseException ex) {
-		    		throw new RuntimeException("error.parsing.final.date");
+		    		throw new DataLoggerException("error.parsing.final.date");
 		    	}
 		    	
 		    	Calendar calendar = GregorianCalendar.getInstance();
