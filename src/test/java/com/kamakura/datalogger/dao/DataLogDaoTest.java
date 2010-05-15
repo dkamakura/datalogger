@@ -39,7 +39,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100123.12456.34789.562009120614020220091225120000789.56123.12001.01000.00076.22080.12093.50" + (char)3 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091206140220091225120078.512.101.100.076.280.193.5" + (char)3 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -50,10 +50,10 @@ public class DataLogDaoTest {
 		assertNotNull("Datalog is null", dataLog);
 		assertEquals(new Long("123456789012345"), dataLog.getSerialNumber());
 		assertEquals(new Integer("100"), dataLog.getSampleInterval());
-		assertEquals(new BigDecimal("123.12"), dataLog.getAlarmMinTemperature());
-		assertEquals(new BigDecimal("456.34"), dataLog.getAlarmMaxTemperature());
-		assertEquals(new BigDecimal("789.56"), dataLog.getCalibrationTemperature());
-		assertEquals("Sun Dec 06 14:02:02 BRST 2009", dataLog.getInitialReadTime().toString());
+		assertEquals(new BigDecimal("12.1"), dataLog.getAlarmMinTemperature());
+		assertEquals(new BigDecimal("45.3"), dataLog.getAlarmMaxTemperature());
+		assertEquals(new BigDecimal("78.5"), dataLog.getCalibrationTemperature());
+		assertEquals("Sun Dec 06 14:02:00 BRST 2009", dataLog.getInitialReadTime().toString());
 		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
@@ -67,22 +67,22 @@ public class DataLogDaoTest {
 		}
 		
 		BigDecimal[] values = dataLog.getSamples().values().toArray(new BigDecimal[0]);
-		assertEquals(new BigDecimal("789.56"), values[0]);
-		assertEquals(new BigDecimal("123.12"), values[1]);
-		assertEquals(new BigDecimal("001.01"), values[2]);
-		assertEquals(new BigDecimal("000.00"), values[3]);
-		assertEquals(new BigDecimal("076.22"), values[4]);
-		assertEquals(new BigDecimal("080.12"), values[5]);
-		assertEquals(new BigDecimal("093.50"), values[6]);
+		assertEquals(new BigDecimal("78.5"), values[0]);
+		assertEquals(new BigDecimal("12.1"), values[1]);
+		assertEquals(new BigDecimal("01.1"), values[2]);
+		assertEquals(new BigDecimal("00.0"), values[3]);
+		assertEquals(new BigDecimal("76.2"), values[4]);
+		assertEquals(new BigDecimal("80.1"), values[5]);
+		assertEquals(new BigDecimal("93.5"), values[6]);
 		
-		assertEquals(new BigDecimal("789.56"), dataLog.getTopTemperature());
-		assertEquals(new BigDecimal("000.00"), dataLog.getBottomTemperature());
+		assertEquals(new BigDecimal("93.5"), dataLog.getTopTemperature());
+		assertEquals(new BigDecimal("00.0"), dataLog.getBottomTemperature());
 
-		assertEquals(new BigDecimal("166.22"), dataLog.getAverageTemperature());
-		assertEquals(new BigDecimal("278.73"), dataLog.getStandardDeviation());
+		assertEquals(new BigDecimal("48.8"), dataLog.getAverageTemperature());
+		assertEquals(new BigDecimal("42.1"), dataLog.getStandardDeviation());
 
-		assertEquals(new Long(100), dataLog.getTimeAboveMaxTemperature());
-		assertEquals(new Long(500), dataLog.getTimeUnderMinTemperature());
+		assertEquals(new Long(400), dataLog.getTimeAboveMaxTemperature());
+		assertEquals(new Long(200), dataLog.getTimeUnderMinTemperature());
 
 		mockery.assertIsSatisfied();
 	}
@@ -93,7 +93,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100-123.12-456.34-789.562009120614020220091225120000-789.56-123.12-001.01-000.00-076.22-080.12-093.50" + (char)3 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("12345678901234500100-12.1-45.3-78.5200912061402200912251200-78.5-12.1-01.1-00.0-76.2-80.1-93.5" + (char)3 + DataLogDao.END_DATA_SIGNAL));
 
 			}
 		});
@@ -105,10 +105,10 @@ public class DataLogDaoTest {
 		assertNotNull("Datalog is null", dataLog);
 		assertEquals(new Long("123456789012345"), dataLog.getSerialNumber());
 		assertEquals(new Integer("100"), dataLog.getSampleInterval());
-		assertEquals(new BigDecimal("-123.12"), dataLog.getAlarmMinTemperature());
-		assertEquals(new BigDecimal("-456.34"), dataLog.getAlarmMaxTemperature());
-		assertEquals(new BigDecimal("-789.56"), dataLog.getCalibrationTemperature());
-		assertEquals("Sun Dec 06 14:02:02 BRST 2009", dataLog.getInitialReadTime().toString());
+		assertEquals(new BigDecimal("-12.1"), dataLog.getAlarmMinTemperature());
+		assertEquals(new BigDecimal("-45.3"), dataLog.getAlarmMaxTemperature());
+		assertEquals(new BigDecimal("-78.5"), dataLog.getCalibrationTemperature());
+		assertEquals("Sun Dec 06 14:02:00 BRST 2009", dataLog.getInitialReadTime().toString());
 		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
@@ -122,22 +122,22 @@ public class DataLogDaoTest {
 		}
 
 		BigDecimal[] values = dataLog.getSamples().values().toArray(new BigDecimal[0]);
-		assertEquals(new BigDecimal("-789.56"), values[0]);
-		assertEquals(new BigDecimal("-123.12"), values[1]);
-		assertEquals(new BigDecimal("-001.01"), values[2]);
-		assertEquals(new BigDecimal("-000.00"), values[3]);
-		assertEquals(new BigDecimal("-076.22"), values[4]);
-		assertEquals(new BigDecimal("-080.12"), values[5]);
-		assertEquals(new BigDecimal("-093.50"), values[6]);
+		assertEquals(new BigDecimal("-78.5"), values[0]);
+		assertEquals(new BigDecimal("-12.1"), values[1]);
+		assertEquals(new BigDecimal("-01.1"), values[2]);
+		assertEquals(new BigDecimal("-00.0"), values[3]);
+		assertEquals(new BigDecimal("-76.2"), values[4]);
+		assertEquals(new BigDecimal("-80.1"), values[5]);
+		assertEquals(new BigDecimal("-93.5"), values[6]);
 		
-		assertEquals(new BigDecimal("000.00"), dataLog.getTopTemperature());
-		assertEquals(new BigDecimal("-789.56"), dataLog.getBottomTemperature());
+		assertEquals(new BigDecimal("00.0"), dataLog.getTopTemperature());
+		assertEquals(new BigDecimal("-93.5"), dataLog.getBottomTemperature());
 
-		assertEquals(new BigDecimal("-166.22"), dataLog.getAverageTemperature());
-		assertEquals(new BigDecimal("278.73"), dataLog.getStandardDeviation());
+		assertEquals(new BigDecimal("-48.8"), dataLog.getAverageTemperature());
+		assertEquals(new BigDecimal("42.1"), dataLog.getStandardDeviation());
 
-		assertEquals(new Long(600), dataLog.getTimeAboveMaxTemperature());
-		assertEquals(new Long(100), dataLog.getTimeUnderMinTemperature());
+		assertEquals(new Long(300), dataLog.getTimeAboveMaxTemperature());
+		assertEquals(new Long(400), dataLog.getTimeUnderMinTemperature());
 
 		mockery.assertIsSatisfied();
 	}
@@ -207,7 +207,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100123.12456.34789.562009120614020220091225120000789.56123.12001.01000.00076.22080.12093.50" + (char)5 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091206140220091225120078.512.101.100.076.280.193.5" + (char)5 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -228,7 +228,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100123.12456.34789.562009130614020220091225120000789.56123.12001.01000.00076.22080.12093.50" + (char)2 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091306140220091225120078.512.101.100.076.280.193.5" + (char)2 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -249,7 +249,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100123.12456.34789.562009120614020220091232120000789.56123.12001.01000.00076.22080.12093.50" + (char)5 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091206140220091232120078.512.101.100.076.280.193.5" + (char)5 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -270,7 +270,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100123.12456.34789.562009120614020220091225120000" + (char)30 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.5200912061402200912251200" + (char)16 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -291,7 +291,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100123.12456.34789.562009120614020220091225120000789.56" + (char)5 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091206140220091225120078.5" + (char)4 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -302,10 +302,10 @@ public class DataLogDaoTest {
 		assertNotNull("Datalog is null", dataLog);
 		assertEquals(new Long("123456789012345"), dataLog.getSerialNumber());
 		assertEquals(new Integer("100"), dataLog.getSampleInterval());
-		assertEquals(new BigDecimal("123.12"), dataLog.getAlarmMinTemperature());
-		assertEquals(new BigDecimal("456.34"), dataLog.getAlarmMaxTemperature());
-		assertEquals(new BigDecimal("789.56"), dataLog.getCalibrationTemperature());
-		assertEquals("Sun Dec 06 14:02:02 BRST 2009", dataLog.getInitialReadTime().toString());
+		assertEquals(new BigDecimal("12.1"), dataLog.getAlarmMinTemperature());
+		assertEquals(new BigDecimal("45.3"), dataLog.getAlarmMaxTemperature());
+		assertEquals(new BigDecimal("78.5"), dataLog.getCalibrationTemperature());
+		assertEquals("Sun Dec 06 14:02:00 BRST 2009", dataLog.getInitialReadTime().toString());
 		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
@@ -319,13 +319,13 @@ public class DataLogDaoTest {
 		}
 
 		BigDecimal[] values = dataLog.getSamples().values().toArray(new BigDecimal[0]);
-		assertEquals(new BigDecimal("789.56"), values[0]);
+		assertEquals(new BigDecimal("78.5"), values[0]);
 		
-		assertEquals(new BigDecimal("789.56"), dataLog.getTopTemperature());
-		assertEquals(new BigDecimal("789.56"), dataLog.getBottomTemperature());
+		assertEquals(new BigDecimal("78.5"), dataLog.getTopTemperature());
+		assertEquals(new BigDecimal("78.5"), dataLog.getBottomTemperature());
 
-		assertEquals(new BigDecimal("789.56"), dataLog.getAverageTemperature());
-		assertEquals(new BigDecimal("0.00"), dataLog.getStandardDeviation());
+		assertEquals(new BigDecimal("78.5"), dataLog.getAverageTemperature());
+		assertEquals(new BigDecimal("0.0"), dataLog.getStandardDeviation());
 
 		assertEquals(new Long(100), dataLog.getTimeAboveMaxTemperature());
 		assertEquals(new Long(0), dataLog.getTimeUnderMinTemperature());

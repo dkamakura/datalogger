@@ -28,20 +28,22 @@ public class DataLogDaoImpl implements DataLogDao {
 	/*
 	 * Serial Number: position 1 - size 15
 	 * Sample Interval: position 2 - size 5
-	 * Minimum Temperature: position 3 - size 3.2
-	 * Maximum Temperature: position 4 - size 3.2
-	 * Calibration Temperature: position 5 - size 3.2
-	 * Initial Read Time: position 6 - size 14 (yyyyMMddhhmiss)
-	 * Final Read Time: position 7 - size 14 (yyyyMMddhhmiss)
+	 * Minimum Temperature: position 3 - size (-)2.1
+	 * Maximum Temperature: position 4 - size (-)2.1
+	 * Calibration Temperature: position 5 - size (-)2.1
+	 * Initial Read Time: position 6 - size 12 (yyyyMMddhhmi)
+	 * Final Read Time: position 7 - size 12 (yyyyMMddhhmi)
 	 * Samples: position 8 - size variable
 	 */
-	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{3}\\.\\d{2})(-?\\d{3}\\.\\d{2})(-?\\d{3}\\.\\d{2})(\\d{14})(\\d{14})((-?\\d{3}\\.\\d{2})*))(.*)" + END_DATA_SIGNAL);
+	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(\\d{12})(\\d{12})((-?\\d{2}\\.\\d{1})*))(.*)" + END_DATA_SIGNAL);
 
-	private static final Pattern samplesPattern = Pattern.compile("(-?\\d{3}\\.\\d{2})(.*)");
+	private static final Pattern samplesPattern = Pattern.compile("(-?\\d{2}\\.\\d{1})(.*)");
 
-	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmmss") {{
+	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmm") {{
 		setLenient(false);
 	}};
+	
+	private static final Integer SCALE = 1;
 
 	@Override
 	public DataLog readDataLog() {
@@ -113,17 +115,17 @@ public class DataLogDaoImpl implements DataLogDao {
 		    	} while(match);
 		    	
 		    	if(!dataLog.getSamples().isEmpty()) {
-					dataLog.setAverageTemperature(sum.divide(new BigDecimal(dataLog.getSamples().values().size()), 2, RoundingMode.HALF_UP));
+					dataLog.setAverageTemperature(sum.divide(new BigDecimal(dataLog.getSamples().values().size()), SCALE, RoundingMode.HALF_UP));
 	
 					BigDecimal variance = new BigDecimal(0);
 					for(BigDecimal sample : dataLog.getSamples().values()) {
 						variance = variance.add(sample.subtract(dataLog.getAverageTemperature()).pow(2));
 					}
 					if(dataLog.getSamples().values().size() > 1) {
-						variance = variance.divide(new BigDecimal(dataLog.getSamples().values().size() - 1), 2, RoundingMode.HALF_UP);
+						variance = variance.divide(new BigDecimal(dataLog.getSamples().values().size() - 1), SCALE, RoundingMode.HALF_UP);
 					}
 					// There is no sqtr in BigDecimal watch for precision issues
-					dataLog.setStandardDeviation(new BigDecimal(Math.sqrt(variance.doubleValue())).setScale(2, RoundingMode.HALF_UP));
+					dataLog.setStandardDeviation(new BigDecimal(Math.sqrt(variance.doubleValue())).setScale(SCALE, RoundingMode.HALF_UP));
 		    	} else {
 		    		throw new DataLoggerException("error.no.samples.returned");
 		    	}
