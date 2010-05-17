@@ -82,6 +82,8 @@ public class DataLoggerView extends FrameView {
     private javax.swing.JFormattedTextField configAlarmMaxTemperatureTextField;
     private javax.swing.JLabel configAlarmMinTemperatureLabel;
     private javax.swing.JFormattedTextField configAlarmMinTemperatureTextField;
+    private javax.swing.JLabel configCalibrationTemperatureLabel;
+    private javax.swing.JFormattedTextField configCalibrationTemperatureTextField;
     private javax.swing.JPanel dataPanel;
     private javax.swing.JSplitPane dataSplitPane;
     private javax.swing.JPanel dataTabPanel;
@@ -269,10 +271,12 @@ public class DataLoggerView extends FrameView {
         configSampleIntervalLabel = new javax.swing.JLabel();
         configAlarmMinTemperatureLabel = new javax.swing.JLabel();
         configAlarmMaxTemperatureLabel = new javax.swing.JLabel();
+        configCalibrationTemperatureLabel = new javax.swing.JLabel();
         configSerialNumberTextField = new javax.swing.JFormattedTextField(serialNumberFormatter);
         configSampleIntervalTextField = new javax.swing.JFormattedTextField(sampleIntervalFormatter);
         configAlarmMinTemperatureTextField = new javax.swing.JFormattedTextField(temperatureFormatter);
         configAlarmMaxTemperatureTextField = new javax.swing.JFormattedTextField(temperatureFormatter);
+        configCalibrationTemperatureTextField = new javax.swing.JFormattedTextField(temperatureFormatter);
         configButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
@@ -548,6 +552,9 @@ public class DataLoggerView extends FrameView {
         configAlarmMaxTemperatureLabel.setText(resourceMap.getString("alarmMaxTemperatureLabel.text"));
         configAlarmMaxTemperatureLabel.setName("alarmMaxTemperatureLabel");
 
+        configCalibrationTemperatureLabel.setText(resourceMap.getString("calibrationTemperatureLabel.text"));
+        configCalibrationTemperatureLabel.setName("calibrationTemperatureLabel");
+
         configSerialNumberTextField.setText(resourceMap.getString("serialNumberConfigTextField.text"));
         configSerialNumberTextField.setName("serialNumberConfigTextField");
 
@@ -559,6 +566,9 @@ public class DataLoggerView extends FrameView {
 
         configAlarmMaxTemperatureTextField.setText(resourceMap.getString("alarmMaxTemperatureTextField.text"));
         configAlarmMaxTemperatureTextField.setName("alarmMaxTemperatureTextField");
+
+        configCalibrationTemperatureTextField.setText(resourceMap.getString("calibrationTemperatureTextField.text"));
+        configCalibrationTemperatureTextField.setName("calibrationTemperatureTextField");
 
         configButton.setText(resourceMap.getString("configButton.text"));
         configButton.setName("configButton");
@@ -572,24 +582,26 @@ public class DataLoggerView extends FrameView {
             .addGroup(configPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(configButton)
                     .addGroup(configPanelLayout.createSequentialGroup()
-                        .addComponent(configSerialNumberLabel)
+                        .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(configSerialNumberLabel)
+                            .addComponent(configCalibrationTemperatureLabel)
+                            .addComponent(configSampleIntervalLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(configSerialNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(configCalibrationTemperatureTextField)
+                            .addComponent(configSerialNumberTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                            .addComponent(configSampleIntervalTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(configPanelLayout.createSequentialGroup()
-                        .addComponent(configSampleIntervalLabel)
+                        .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(configAlarmMinTemperatureLabel)
+                            .addComponent(configAlarmMaxTemperatureLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(configSampleIntervalTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(configPanelLayout.createSequentialGroup()
-                        .addComponent(configAlarmMinTemperatureLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(configAlarmMinTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(configPanelLayout.createSequentialGroup()
-                        .addComponent(configAlarmMaxTemperatureLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(configAlarmMaxTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(configButton))
-                .addContainerGap(370, Short.MAX_VALUE))
+                        .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(configAlarmMinTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(configAlarmMaxTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(472, Short.MAX_VALUE))
         );
 
         configPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {configAlarmMaxTemperatureLabel, configAlarmMinTemperatureLabel, configSampleIntervalLabel, configSerialNumberLabel});
@@ -605,21 +617,25 @@ public class DataLoggerView extends FrameView {
                     .addComponent(configSerialNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(configSampleIntervalLabel)
-                    .addComponent(configSampleIntervalTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(configCalibrationTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(configCalibrationTemperatureLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(configAlarmMinTemperatureLabel)
-                    .addComponent(configAlarmMinTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(configSampleIntervalTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(configSampleIntervalLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(configAlarmMaxTemperatureLabel)
-                    .addComponent(configAlarmMaxTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(configAlarmMinTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(configAlarmMinTemperatureLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(configPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(configAlarmMaxTemperatureTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(configAlarmMaxTemperatureLabel))
+                .addGap(34, 34, 34)
                 .addComponent(configButton)
-                .addContainerGap(208, Short.MAX_VALUE))
+                .addContainerGap(147, Short.MAX_VALUE))
         );
-
+        
         functionsTabbedPane.addTab(resourceMap.getString("configPanel.TabConstraints.tabTitle"), configPanel);
 
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
@@ -859,14 +875,11 @@ public class DataLoggerView extends FrameView {
             super(app);
         }
         @Override protected Object doInBackground() {
-        	if(configSerialNumberTextField.getText().equals("") || configSampleIntervalTextField.getText().equals("") || configAlarmMinTemperatureTextField.getText().equals("") || configAlarmMaxTemperatureTextField.getText().equals("")) {
-        		throw new DataLoggerException("error.invalid.configuration");
-        	}
-        	
-        	DataLoggerConfiguration dataLoggerConfiguration = new DataLoggerConfiguration();
-        	dataLoggerConfiguration.setSerialNumber(new Long(configSerialNumberTextField.getText()));
-        	dataLoggerConfiguration.setSampleInterval(new Integer(configSampleIntervalTextField.getText()));
+	    	DataLoggerConfiguration dataLoggerConfiguration = new DataLoggerConfiguration();
         	try {
+		    	dataLoggerConfiguration.setSerialNumber(new Long(configSerialNumberTextField.getText()));
+	        	dataLoggerConfiguration.setCalibrationTemperature(new BigDecimal(temperatureFormatter.parse(configCalibrationTemperatureTextField.getText()).doubleValue()));
+		    	dataLoggerConfiguration.setSampleInterval(new Integer(configSampleIntervalTextField.getText()));
 	        	dataLoggerConfiguration.setAlarmMinTemperature(new BigDecimal(temperatureFormatter.parse(configAlarmMinTemperatureTextField.getText()).doubleValue()));
 	        	dataLoggerConfiguration.setAlarmMaxTemperature(new BigDecimal(temperatureFormatter.parse(configAlarmMaxTemperatureTextField.getText()).doubleValue()));
         	} catch (Exception e) {
@@ -875,11 +888,11 @@ public class DataLoggerView extends FrameView {
         	
         	dataLoggerBusiness.writeConfiguration(dataLoggerConfiguration);
         	
-            return "Datalogger Configured";
+            return null;
         }
         
         @Override protected void succeeded(Object result) {
-        	showMessage(result.toString());
+        	showMessage(resourceMap.getString("applicationMessageLabel.device.configured"));
         	clearConfiguration();
         }
         @Override protected void failed(Throwable cause) {
