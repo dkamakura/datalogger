@@ -52,7 +52,7 @@ public class DataLogDaoImpl implements DataLogDao {
 		serialPortCommunicator.write(START_DATA_SIGNAL);
 
 		String data = serialPortCommunicator.read();
-		if(data != null && !data.equals("")) {
+		if(data != null) {
 			Matcher dataMatcher = dataPattern.matcher(data);
 		    
 		    if (dataMatcher.find()) {
@@ -69,7 +69,7 @@ public class DataLogDaoImpl implements DataLogDao {
 		    	dataLog.setAlarmMinTemperature(new BigDecimal(dataMatcher.group(4))); 
 		    	dataLog.setAlarmMaxTemperature(new BigDecimal(dataMatcher.group(5)));
 		    	dataLog.setCalibrationTemperature(new BigDecimal(dataMatcher.group(6))); 
-
+	
 		    	try {
 		    		dataLog.setInitialReadTime(dateFormatter.parse(dataMatcher.group(7)));
 		    	} catch(ParseException ex) {
@@ -129,11 +129,12 @@ public class DataLogDaoImpl implements DataLogDao {
 		    	} else {
 		    		throw new DataLoggerException("error.no.samples.returned");
 		    	}
-		    } else {
-	    		throw new DataLoggerException("error.invalid.data");
 		    }
 		}
 
+		if(dataLog == null) {
+    		throw new DataLoggerException("error.invalid.data");
+		}
 		return dataLog;
 	}
 }

@@ -2,7 +2,6 @@ package com.kamakura.datalogger.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -23,7 +22,7 @@ import com.kamakura.datalogger.exception.DataLoggerException;
 import com.kamakura.datalogger.model.DataLog;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:/spring/*.xml" })
+@ContextConfiguration(locations = {"classpath*:/spring/communication-spring-cfg.xml", "classpath*:/spring/test-datalogger-spring-cfg.xml"})
 public class DataLogDaoTest {
 
 	@Autowired
@@ -154,9 +153,11 @@ public class DataLogDaoTest {
 
 		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
 
-		DataLog dataLog = dataLogDao.readDataLog();
-
-		assertNull("Datalog is not null", dataLog);
+		try {
+			dataLogDao.readDataLog();
+		} catch(DataLoggerException ex) {
+			assertEquals("error.invalid.data", ex.getMessage());
+		}
 
 		mockery.assertIsSatisfied();
 	}
@@ -173,9 +174,11 @@ public class DataLogDaoTest {
 
 		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
 
-		DataLog dataLog = dataLogDao.readDataLog();
-
-		assertNull("Datalog is not null", dataLog);
+		try {
+			dataLogDao.readDataLog();
+		} catch(DataLoggerException ex) {
+			assertEquals("error.invalid.data", ex.getMessage());
+		}
 
 		mockery.assertIsSatisfied();
 	}
@@ -193,7 +196,7 @@ public class DataLogDaoTest {
 		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
 
 		try {
-			DataLog dataLog = dataLogDao.readDataLog();
+			dataLogDao.readDataLog();
 		} catch(DataLoggerException ex) {
 			assertEquals("error.invalid.data", ex.getMessage());
 		}
@@ -214,7 +217,7 @@ public class DataLogDaoTest {
 		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
 
 		try {
-			DataLog dataLog = dataLogDao.readDataLog();
+			dataLogDao.readDataLog();
 		} catch(DataLoggerException ex) {
 			assertEquals("error.corrupted.data", ex.getMessage());
 		}
@@ -235,7 +238,7 @@ public class DataLogDaoTest {
 		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
 
 		try {
-			DataLog dataLog = dataLogDao.readDataLog();
+			dataLogDao.readDataLog();
 		} catch(DataLoggerException ex) {
 			assertEquals("error.parsing.initial.date", ex.getMessage());
 		}
@@ -256,7 +259,7 @@ public class DataLogDaoTest {
 		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
 
 		try {
-			DataLog dataLog = dataLogDao.readDataLog();
+			dataLogDao.readDataLog();
 		} catch(DataLoggerException ex) {
 			assertEquals("error.parsing.final.date", ex.getMessage());
 		}
@@ -277,7 +280,7 @@ public class DataLogDaoTest {
 		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
 
 		try {
-			DataLog dataLog = dataLogDao.readDataLog();
+			dataLogDao.readDataLog();
 		} catch(DataLoggerException ex) {
 			assertEquals("error.no.samples.returned", ex.getMessage());
 		}

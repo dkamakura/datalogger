@@ -18,7 +18,7 @@ import com.kamakura.datalogger.exception.DataLoggerException;
 import com.kamakura.datalogger.model.DataLoggerConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath*:/spring/*.xml"})
+@ContextConfiguration(locations = {"classpath*:/spring/communication-spring-cfg.xml", "classpath*:/spring/test-datalogger-spring-cfg.xml"})
 public class ConfigurationDaoTest {
 
 	@Autowired

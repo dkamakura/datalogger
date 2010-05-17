@@ -22,7 +22,7 @@ import com.kamakura.communication.i18n.MessageResourceUtil;
  * @since 1.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath*:/spring/*.xml"})
+@ContextConfiguration(locations = {"classpath*:/spring/communication-spring-cfg.xml", "classpath*:/spring/test-datalogger-spring-cfg.xml"})
 public class MessageResourceUtilTest {
   @Test
   public void testGetMessage() {
