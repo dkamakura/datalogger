@@ -1,0 +1,2 @@
+To generate javaws package run:
+mvn clean install webstart:jnlp

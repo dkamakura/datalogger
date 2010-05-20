@@ -53,6 +53,69 @@
 					</argLine>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo.webstart</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jnlp</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludeTransitive>false</excludeTransitive>
+					<libPath>lib</libPath>
+					<dependencies>
+						<includes>
+							<include>aopalliance:aopalliance</include>
+							<include>net.java.dev.appframework:appframework</include>
+							<include>org.aspectj:aspectjrt</include>
+							<include>org.aspectj:aspectjweaver</include>
+							<include>commons-beanutils:commons-beanutils</include>
+							<include>commons-beanutils:commons-beanutils-bean-collections</include>
+							<include>commons-logging:commons-logging</include>
+							<include>com.kamakura:communication</include>
+							<include>jfree:jcommon</include>
+							<include>jfree:jfreechart</include>
+							<include>log4j:log4j</include>
+							<include>org.rxtx:rxtx</include>
+							<include>org.rxtx:rxtx-native</include>
+							<include>org.springframework:spring-aop</include>
+							<include>org.springframework:spring-asm</include>
+							<include>org.springframework:spring-beans</include>
+							<include>org.springframework:spring-context</include>
+							<include>org.springframework:spring-core</include>
+							<include>org.springframework:spring-expression</include>
+							<include>org.swinglabs:swing-worker</include>
+						</includes>
+					</dependencies>
+					<jnlp>
+						<outputFile>datalogger.jnlp</outputFile>
+						<mainClass>com.kamakura.datalogger.app.DataLoggerApp</mainClass>
+					</jnlp>
+					<sign>
+						<keystore>datalogger.keys</keystore>
+						<keypass>p@ssw0rd!*</keypass>
+						<storepass>p@ssw0rd!*</storepass>
+						<alias>https://danielkamakura.com</alias>
+						<dnameCn>Daniel Kamakura</dnameCn>
+						<dnameOu>Software Programming</dnameOu>
+						<dnameO>Kamakuras Consulting</dnameO>
+						<dnameL>São Paulo</dnameL>
+						<dnameSt>SP</dnameSt>
+						<dnameC>BR</dnameC>
+						<verify>true</verify>
+						<keystoreConfig>
+							<delete>true</delete>
+							<gen>true</gen>
+						</keystoreConfig>
+					</sign>
+					<pack200>true</pack200>
+					<gzip>true</gzip>
+					<verbose>false</verbose>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>

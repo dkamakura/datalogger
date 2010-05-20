@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="$jnlpspec">
+	<information>
+		<title>Datalogger</title>
+		<vendor>Kamakura's Consulting</vendor>
+		<description>Datalogger</description>
+#if($offlineAllowed)
+		<offline-allowed/>
+#end
+	</information>
+#if($allPermissions)
+	<security>
+		<all-permissions/>
+	</security>
+#end
+	<resources>
+		<j2se version="1.6+"/>
+		$dependencies
+	</resources>
+	<resources os="Linux"> 
+		<nativelib href="lib/rxtx-native-2.1.7-linux.jar"/>	
+    </resource>
+    <resources os="Windows"> 
+		<nativelib href="lib/rxtx-native-2.1.7-windows.jar"/>	
+    </resource>
+	
+	<application-desc main-class="$mainClass"/>
+</jnlp>
