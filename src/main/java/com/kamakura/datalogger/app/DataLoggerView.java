@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -815,9 +817,35 @@ public class DataLoggerView extends FrameView {
         	configAlarmMaxTemperatureTextField.setText("");
         }
     }
-    
-    @Action
-    public void printData() {
-    	System.out.println("Teste");
+
+    @Action(block = Task.BlockingScope.NONE)
+    public Task<Object, Void> printData() {
+        return new PrintDataTask(getApplication());
+    }
+
+    private class PrintDataTask extends org.jdesktop.application.Task<Object, Void> {
+    	PrintDataTask(org.jdesktop.application.Application app) {
+            super(app);
+        }
+        @Override protected Object doInBackground() {
+        	
+            PrinterJob printJob = PrinterJob.getPrinterJob();
+            printJob.setPrintable((org.jfree.chart.ChartPanel)chartPanel);
+            if (printJob.printDialog())
+              try {
+                printJob.print();
+              } catch(PrinterException pe) {
+          		throw new DataLoggerException("error.printing.chart");
+              }
+        	
+            return null;
+        }
+        
+        @Override protected void succeeded(Object result) {
+        	showMessage(resourceMap.getString("applicationMessageLabel.chart.printed"));
+        }
+        @Override protected void failed(Throwable cause) {
+        	showMessage(cause.getLocalizedMessage());
+        }
     }
 }

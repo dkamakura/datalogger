@@ -7,6 +7,7 @@ package com.kamakura.datalogger.app;
 import org.apache.log4j.Logger;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -58,5 +59,10 @@ public class DataLoggerAppTest extends DataLoggerApp {
 	 */
 	public static void main(String[] args) {
 		launch(DataLoggerAppTest.class, args);
+	}
+	
+	@Test
+	public void testOk() {
+		
 	}
 }
