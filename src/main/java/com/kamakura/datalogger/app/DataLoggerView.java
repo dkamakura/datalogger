@@ -4,7 +4,6 @@
 
 package com.kamakura.datalogger.app;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -15,14 +14,12 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
@@ -32,28 +29,6 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.Task;
 import org.jdesktop.application.TaskMonitor;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.PeriodAxis;
-import org.jfree.chart.axis.PeriodAxisLabelInfo;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.chart.plot.Marker;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.ValueMarker;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.time.Day;
-import org.jfree.data.time.Hour;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.ui.Layer;
-import org.jfree.ui.LengthAdjustmentType;
-import org.jfree.ui.RectangleAnchor;
-import org.jfree.ui.TextAnchor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -62,6 +37,7 @@ import com.kamakura.datalogger.business.DataLoggerBusiness;
 import com.kamakura.datalogger.exception.DataLoggerException;
 import com.kamakura.datalogger.model.DataLog;
 import com.kamakura.datalogger.model.DataLoggerConfiguration;
+import com.kamakura.datalogger.util.ChartBuilder;
 
 /**
  * The application's main frame.
@@ -134,12 +110,19 @@ public class DataLoggerView extends FrameView {
     
     @Autowired
     private SerialPortConfiguration serialPortConfiguration;
-    
-    private static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm") {{
+
+    @Autowired
+    private ChartBuilder chartBuilder;
+
+    private static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm") {
+        private static final long serialVersionUID = -1065659425735047652L;
+	{
     	setLenient(false);
     }};
 
-    private static final NumberFormat temperatureFormatter = new DecimalFormat("#0.0") {{
+    private static final NumberFormat temperatureFormatter = new DecimalFormat("#0.0") {
+        private static final long serialVersionUID = 6336985835001301033L;
+	{
     	DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
     	decimalFormatSymbols.setDecimalSeparator('.');
     	setDecimalFormatSymbols(decimalFormatSymbols);
@@ -149,10 +132,6 @@ public class DataLoggerView extends FrameView {
     private static NumberFormat serialNumberFormatter = new DecimalFormat("##############0");
 
     private static NumberFormat sampleIntervalFormatter = new DecimalFormat("####0");
-    
-    private static DateFormat timeFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm") {{
-    	setLenient(true);
-    }};
     
     public DataLoggerView() {
     	super(Application.getInstance());
@@ -762,7 +741,7 @@ public class DataLoggerView extends FrameView {
         @Override protected void succeeded(Object result) {
         	DataLog dataLog = (DataLog)result;
         	this.showData(dataLog);
-        	chartPanel = this.buildChart(dataLog);
+        	chartPanel = chartBuilder.buildChart(dataLog);
         	dataSplitPane.setRightComponent(chartPanel);
         }
         @Override protected void failed(Throwable cause) {
@@ -790,78 +769,8 @@ public class DataLoggerView extends FrameView {
         	finalReadTimeTextField.setText(dateFormatter.format(dataLog.getFinalReadTime()));
         	averageTemperatureTextField.setText(temperatureFormatter.format(dataLog.getAverageTemperature()));
         	standardDeviationTextField.setText(temperatureFormatter.format(dataLog.getStandardDeviation()));
-        	timeUnderMinTemperatureTextField.setText(timeFormatter.format(dataLog.getTimeUnderMinTemperature()));
-        	timeAboveMaxTemperatureTextField.setText(timeFormatter.format(dataLog.getTimeAboveMaxTemperature()));
-        }
-
-        private JPanel buildChart(DataLog dataLog) {
-        	TimeSeriesCollection result = new TimeSeriesCollection();   
-        	TimeSeries dateSeries = new TimeSeries("Temperature");
-        	for(Date date : dataLog.getSamples().keySet()) {
-        		dateSeries.add(new TimeSeriesDataItem(new Minute(date), dataLog.getSamples().get(date).doubleValue()));   
-        	}
-        	result.addSeries(dateSeries);
-        	
-        	JFreeChart chart = ChartFactory.createXYLineChart(   
-        			"Temperature Log",   
-        			"Date/Time",   
-        			"Temperature",    
-        			result,
-        			PlotOrientation.VERTICAL,   
-        			false,    
-        			false,    
-        			false   
-        	);
-        	
-        	XYPlot plot = (XYPlot) chart.getPlot();   
-        	plot.setDomainGridlinePaint(Color.white);   
-        	plot.setDomainGridlineStroke(new BasicStroke(1.0f));   
-        	plot.setRangeGridlinePaint(Color.lightGray);   
-        	plot.setRangeGridlineStroke(new BasicStroke(1.0f));   
-        	plot.setRangeTickBandPaint(new Color(240, 240, 240));   
-
-        	// set axis margins to allow space for marker labels...   
-        	PeriodAxis domainAxis = new PeriodAxis(null, new Hour(dataLog.getInitialReadTime()), new Hour(dataLog.getFinalReadTime()));   
-        	PeriodAxisLabelInfo[] info = new PeriodAxisLabelInfo[2];   
-        	info[0] = new PeriodAxisLabelInfo(Minute.class, new SimpleDateFormat("HH:mm"));   
-        	info[1] = new PeriodAxisLabelInfo(Day.class, new SimpleDateFormat("dd-MMM"));   
-        	domainAxis.setLabelInfo(info);
-        	
-        	plot.setDomainAxis(domainAxis);   
-
-        	ValueAxis rangeAxis = plot.getRangeAxis();   
-        	rangeAxis.setRange(dataLog.getBottomTemperature().doubleValue(), dataLog.getTopTemperature().doubleValue());   
-
-        	XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();   
-        	renderer.setBaseShapesVisible(true);   
-        	renderer.setSeriesFillPaint(0, Color.white);   
-        	renderer.setUseFillPaint(true);
-
-        	Marker cooling = new IntervalMarker(dataLog.getAlarmMinTemperature().doubleValue(), dataLog.getAlarmMaxTemperature().doubleValue());   
-        	cooling.setLabelOffsetType(LengthAdjustmentType.EXPAND);   
-        	cooling.setPaint(new Color(150, 150, 255));   
-        	plot.addRangeMarker(cooling, Layer.BACKGROUND);   
-        	
-        	Marker minTemp = new ValueMarker(dataLog.getAlarmMinTemperature().doubleValue(), Color.blue,    
-        	        new BasicStroke(2.0f));
-        	minTemp.setLabel("Temperatura Mínima");   
-        	minTemp.setLabelFont(new Font("SansSerif", Font.PLAIN, 11));   
-        	minTemp.setLabelPaint(Color.BLUE);   
-        	minTemp.setLabelAnchor(RectangleAnchor.TOP_LEFT);   
-        	minTemp.setLabelTextAnchor(TextAnchor.BOTTOM_LEFT);   
-        	
-        	Marker maxTemp = new ValueMarker(dataLog.getAlarmMaxTemperature().doubleValue(), Color.blue,    
-        	        new BasicStroke(2.0f));
-        	maxTemp.setLabel("Temperatura Máxima");   
-        	maxTemp.setLabelFont(new Font("SansSerif", Font.PLAIN, 11));   
-        	maxTemp.setLabelPaint(Color.BLUE);   
-        	maxTemp.setLabelAnchor(RectangleAnchor.TOP_LEFT);   
-        	maxTemp.setLabelTextAnchor(TextAnchor.BOTTOM_LEFT);   
-        	
-        	plot.addRangeMarker(minTemp, Layer.BACKGROUND);   
-        	plot.addRangeMarker(maxTemp, Layer.BACKGROUND);    
-        	
-        	return new ChartPanel(chart);
+        	timeUnderMinTemperatureTextField.setText(dataLog.getTimeUnderMinTemperature().toString());
+        	timeAboveMaxTemperatureTextField.setText(dataLog.getTimeAboveMaxTemperature().toString());
         }
     }
     

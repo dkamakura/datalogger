@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="$jnlpspec">
+<jnlp spec="$jnlpspec" codebase="http://www.danielkamakura.com/datalogger" href="datalogger.jnlp">
 	<information>
 		<title>Datalogger</title>
 		<vendor>Kamakura's Consulting</vendor>

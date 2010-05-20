@@ -16,7 +16,9 @@ import com.kamakura.datalogger.util.DataLoggerUtil;
 @Repository
 public class ConfigurationDaoImpl implements ConfigurationDao {
 
-    private static final NumberFormat temperatureFormatter = new DecimalFormat("000.00") {{
+    private static final NumberFormat temperatureFormatter = new DecimalFormat("000.00") {
+        private static final long serialVersionUID = 6070138055311487837L;
+	{
     	DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
     	decimalFormatSymbols.setDecimalSeparator('.');
     	setDecimalFormatSymbols(decimalFormatSymbols);

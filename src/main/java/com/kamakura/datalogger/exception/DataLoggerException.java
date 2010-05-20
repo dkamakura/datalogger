@@ -5,7 +5,7 @@
  */
 package com.kamakura.datalogger.exception;
 
-import com.kamakura.communication.i18n.MessageResourceUtil;
+import com.kamakura.communication.i18n.MessageSourceUtil;
 
 /**
  * @author Daniel de Aguiar Kamakura
@@ -38,6 +38,6 @@ public class DataLoggerException extends RuntimeException {
 
 	@Override
 	public String getLocalizedMessage() {
-		return MessageResourceUtil.getMessage(this.getMessage(), params);
+		return MessageSourceUtil.getMessage(this.getMessage(), params);
 	}
 }

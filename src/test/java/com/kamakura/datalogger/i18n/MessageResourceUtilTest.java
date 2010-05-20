@@ -1,5 +1,5 @@
 /**
- * MessageResourceUtilTest.java
+ * MessageSourceUtilTest.java
  *
  * Copyright 2010-2010 Daniel de Aguiar Kamakura
  */
@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.kamakura.communication.i18n.MessageResourceUtil;
+import com.kamakura.communication.i18n.MessageSourceUtil;
 
 /**
  * @author Daniel de Aguiar Kamakura
@@ -26,9 +26,9 @@ import com.kamakura.communication.i18n.MessageResourceUtil;
 public class MessageResourceUtilTest {
   @Test
   public void testGetMessage() {
-    MessageResourceUtil.setLocale(new Locale("pt", "BR"));
+    MessageSourceUtil.setLocale(new Locale("pt", "BR"));
     
-    assertEquals("Erro ao abrir streams.", MessageResourceUtil.getMessage("error.opening.streams"));
-    assertEquals("Sinal de Término de Dados não encontrado.", MessageResourceUtil.getMessage("error.end.data.signal.not.found"));
+    assertEquals("Erro ao abrir streams.", MessageSourceUtil.getMessage("error.opening.streams"));
+    assertEquals("Sinal de Término de Dados não encontrado.", MessageSourceUtil.getMessage("error.end.data.signal.not.found"));
   }
 }

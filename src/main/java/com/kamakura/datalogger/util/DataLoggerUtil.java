@@ -5,9 +5,6 @@
  */
 package com.kamakura.datalogger.util;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 public class DataLoggerUtil {
 	public static char calculateLRC(String str) {

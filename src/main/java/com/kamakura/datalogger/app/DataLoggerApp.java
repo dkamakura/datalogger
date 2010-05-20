@@ -4,8 +4,6 @@
 
 package com.kamakura.datalogger.app;
 
-import java.util.Locale;
-
 import org.apache.log4j.Logger;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
@@ -23,7 +21,6 @@ public class DataLoggerApp extends SingleFrameApplication {
 	 */
 	@Override
 	protected void startup() {
-		Locale.setDefault(new Locale("en"));
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath*:/spring/*.xml");
 		show(applicationContext.getBean(DataLoggerView.class));
 	}

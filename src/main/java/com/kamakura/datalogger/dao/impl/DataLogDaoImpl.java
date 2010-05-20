@@ -39,7 +39,9 @@ public class DataLogDaoImpl implements DataLogDao {
 
 	private static final Pattern samplesPattern = Pattern.compile("(-?\\d{2}\\.\\d{1})(.*)");
 
-	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmm") {{
+	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmm") {
+        private static final long serialVersionUID = -6034143342693900294L;
+	{
 		setLenient(false);
 	}};
 	
