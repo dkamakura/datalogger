@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
@@ -69,7 +70,8 @@ public class DataLoggerView extends FrameView {
     private javax.swing.JTextField finalReadTimeTextField;
     private javax.swing.JTabbedPane functionsTabbedPane;
     private javax.swing.JScrollPane chartTabPanel;
-    private javax.swing.JPanel chartPanel;
+    private org.jfree.chart.ChartPanel chartPanel;
+    private javax.swing.JScrollPane chartScrollPane;
     private javax.swing.JLabel initialReadTimeLabel;
     private javax.swing.JTextField initialReadTimeTextField;
     private javax.swing.JPanel mainPanel;
@@ -744,7 +746,12 @@ public class DataLoggerView extends FrameView {
         	DataLog dataLog = (DataLog)result;
         	this.showData(dataLog);
         	chartPanel = chartBuilder.buildChart(dataLog);
-        	dataSplitPane.setRightComponent(chartPanel);
+        	
+        	chartScrollPane = new JScrollPane(chartPanel);
+        	chartScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        	chartScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        	
+        	dataSplitPane.setRightComponent(chartScrollPane);
         }
         @Override protected void failed(Throwable cause) {
         	showMessage(cause.getLocalizedMessage());
@@ -828,15 +835,19 @@ public class DataLoggerView extends FrameView {
             super(app);
         }
         @Override protected Object doInBackground() {
-        	
-            PrinterJob printJob = PrinterJob.getPrinterJob();
-            printJob.setPrintable((org.jfree.chart.ChartPanel)chartPanel);
-            if (printJob.printDialog())
-              try {
-                printJob.print();
-              } catch(PrinterException pe) {
-          		throw new DataLoggerException("error.printing.chart");
-              }
+        	PrinterJob job = PrinterJob.getPrinterJob();
+        	PageFormat pf = job.defaultPage();
+        	PageFormat pf2 = job.pageDialog(pf);
+        	if (pf2 != pf) {
+        		job.setPrintable(chartPanel, pf2);
+        		if (job.printDialog()) {
+        			try {
+        				job.print();
+        			} catch (PrinterException e) {
+        				throw new DataLoggerException("error.printing.chart", e);
+        			}
+        		}
+        	}
         	
             return null;
         }

@@ -3,10 +3,9 @@ package com.kamakura.datalogger.util;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -37,8 +36,9 @@ import com.kamakura.datalogger.model.DataLog;
 
 @Component
 public class ChartBuilder {
+	private static final Integer MARGIN = 20;
 	
-    public JPanel buildChart(DataLog dataLog) {
+    public ChartPanel buildChart(DataLog dataLog) {
     	TimeSeriesCollection result = new TimeSeriesCollection();   
     	TimeSeries dateSeries = new TimeSeries(MessageSourceUtil.getMessage("chart.label.temperature"));
     	for(Date date : dataLog.getSamples().keySet()) {
@@ -54,7 +54,7 @@ public class ChartBuilder {
     			PlotOrientation.VERTICAL,   
     			false,    
     			false,    
-    			false   
+    			false
     	);
     	
     	XYPlot plot = (XYPlot) chart.getPlot();   
@@ -73,8 +73,10 @@ public class ChartBuilder {
     	
     	plot.setDomainAxis(domainAxis);   
 
-    	ValueAxis rangeAxis = plot.getRangeAxis();   
-    	rangeAxis.setRange(dataLog.getBottomTemperature().doubleValue(), dataLog.getTopTemperature().doubleValue());   
+    	ValueAxis rangeAxis = plot.getRangeAxis();
+    	BigDecimal maxTemperature = dataLog.getAlarmMaxTemperature().compareTo(dataLog.getTopTemperature()) > 0 ? dataLog.getAlarmMaxTemperature() : dataLog.getTopTemperature(); 
+    	BigDecimal minTemperature = dataLog.getAlarmMinTemperature().compareTo(dataLog.getBottomTemperature()) < 0 ? dataLog.getAlarmMinTemperature() : dataLog.getBottomTemperature(); 
+    	rangeAxis.setRange(minTemperature.doubleValue() - MARGIN, maxTemperature.doubleValue() + MARGIN);   
 
     	XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();   
     	renderer.setBaseShapesVisible(true);   
@@ -104,7 +106,7 @@ public class ChartBuilder {
     	
     	plot.addRangeMarker(minTemp, Layer.BACKGROUND);   
     	plot.addRangeMarker(maxTemp, Layer.BACKGROUND);    
-    	
+
     	return new ChartPanel(chart);
     }
 }
