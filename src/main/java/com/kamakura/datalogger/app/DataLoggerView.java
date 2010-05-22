@@ -130,12 +130,25 @@ public class DataLoggerView extends FrameView {
     	DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
     	decimalFormatSymbols.setDecimalSeparator('.');
     	setDecimalFormatSymbols(decimalFormatSymbols);
+		setMaximumFractionDigits(1);
+		setMaximumIntegerDigits(2);
+    	
     }};
     
 
-    private static NumberFormat serialNumberFormatter = new DecimalFormat("##############0");
+    private static NumberFormat serialNumberFormatter = new DecimalFormat("##############0") {
+		private static final long serialVersionUID = 1568292922173869276L;
+	{
+        setMaximumFractionDigits(0);
+        setMaximumIntegerDigits(15);
+    }};
 
-    private static NumberFormat sampleIntervalFormatter = new DecimalFormat("####0");
+    private static NumberFormat sampleIntervalFormatter = new DecimalFormat("####0") {
+		private static final long serialVersionUID = 7788525257956762L;
+	{
+		setMaximumFractionDigits(0);
+		setMaximumIntegerDigits(5);
+    }};
     
     public DataLoggerView() {
     	super(Application.getInstance());
