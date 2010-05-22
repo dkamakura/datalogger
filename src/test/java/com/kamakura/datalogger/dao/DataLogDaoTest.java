@@ -38,7 +38,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("1234567890123450010012.145.378.520091206140220091225120078.512.101.100.076.280.193.5" + (char)3 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091206140278.512.101.100.076.280.193.5" + (char)15 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -53,7 +53,7 @@ public class DataLogDaoTest {
 		assertEquals(new BigDecimal("45.3"), dataLog.getAlarmMaxTemperature());
 		assertEquals(new BigDecimal("78.5"), dataLog.getCalibrationTemperature());
 		assertEquals("Sun Dec 06 14:02:00 BRST 2009", dataLog.getInitialReadTime().toString());
-		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
+		assertEquals(new Date(), dataLog.getFinalReadTime());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
 
@@ -92,7 +92,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("12345678901234500100-12.1-45.3-78.5200912061402200912251200-78.5-12.1-01.1-00.0-76.2-80.1-93.5" + (char)3 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("12345678901234500100-12.1-45.3-78.5200912061402-78.5-12.1-01.1-00.0-76.2-80.1-93.5" + (char)15 + DataLogDao.END_DATA_SIGNAL));
 
 			}
 		});
@@ -108,7 +108,7 @@ public class DataLogDaoTest {
 		assertEquals(new BigDecimal("-45.3"), dataLog.getAlarmMaxTemperature());
 		assertEquals(new BigDecimal("-78.5"), dataLog.getCalibrationTemperature());
 		assertEquals("Sun Dec 06 14:02:00 BRST 2009", dataLog.getInitialReadTime().toString());
-		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
+		assertEquals(new Date(), dataLog.getFinalReadTime());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
 
@@ -210,7 +210,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("1234567890123450010012.145.378.520091206140220091225120078.512.101.100.076.280.193.5" + (char)5 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091206140278.512.101.100.076.280.193.5" + (char)5 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -231,7 +231,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("1234567890123450010012.145.378.520091306140220091225120078.512.101.100.076.280.193.5" + (char)2 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091306140278.512.101.100.076.280.193.5" + (char)14 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -247,33 +247,12 @@ public class DataLogDaoTest {
 	}
 
 	@Test
-	public void testReadDataLogInvalidFinalDate() {
-		mockery.checking(new Expectations() {
-			{
-				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
-				one(serialPortCommunicator).read();
-				will(returnValue("1234567890123450010012.145.378.520091206140220091232120078.512.101.100.076.280.193.5" + (char)5 + DataLogDao.END_DATA_SIGNAL));
-			}
-		});
-
-		ReflectionTestUtils.setField(dataLogDao, "serialPortCommunicator", serialPortCommunicator);
-
-		try {
-			dataLogDao.readDataLog();
-		} catch(DataLoggerException ex) {
-			assertEquals("error.parsing.final.date", ex.getMessage());
-		}
-
-		mockery.assertIsSatisfied();
-	}
-
-	@Test
 	public void testReadDataLogNoSamples() {
 		mockery.checking(new Expectations() {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("1234567890123450010012.145.378.5200912061402200912251200" + (char)16 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.5200912061402" + (char)28 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -294,7 +273,7 @@ public class DataLogDaoTest {
 			{
 				one(serialPortCommunicator).write(DataLogDao.START_DATA_SIGNAL);
 				one(serialPortCommunicator).read();
-				will(returnValue("1234567890123450010012.145.378.520091206140220091225120078.5" + (char)4 + DataLogDao.END_DATA_SIGNAL));
+				will(returnValue("1234567890123450010012.145.378.520091206140278.5" + (char)8 + DataLogDao.END_DATA_SIGNAL));
 			}
 		});
 
@@ -309,7 +288,7 @@ public class DataLogDaoTest {
 		assertEquals(new BigDecimal("45.3"), dataLog.getAlarmMaxTemperature());
 		assertEquals(new BigDecimal("78.5"), dataLog.getCalibrationTemperature());
 		assertEquals("Sun Dec 06 14:02:00 BRST 2009", dataLog.getInitialReadTime().toString());
-		assertEquals("Fri Dec 25 12:00:00 BRST 2009", dataLog.getFinalReadTime().toString());
+		assertEquals(new Date(), dataLog.getFinalReadTime());
 
 		assertNotNull("Samples is null", dataLog.getSamples());
 

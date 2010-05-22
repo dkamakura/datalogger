@@ -11,12 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -26,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
+import org.apache.log4j.Logger;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.FrameView;
@@ -37,16 +33,19 @@ import org.springframework.stereotype.Controller;
 
 import com.kamakura.communication.config.SerialPortConfiguration;
 import com.kamakura.datalogger.business.DataLoggerBusiness;
+import com.kamakura.datalogger.exception.DataLoggerBusinessException;
 import com.kamakura.datalogger.exception.DataLoggerException;
 import com.kamakura.datalogger.model.DataLog;
 import com.kamakura.datalogger.model.DataLoggerConfiguration;
 import com.kamakura.datalogger.util.ChartBuilder;
+import com.kamakura.datalogger.util.DataLoggerUtil;
 
 /**
  * The application's main frame.
  */
 @Controller
 public class DataLoggerView extends FrameView {
+	Logger logger = Logger.getLogger(DataLoggerView.class);
 
     private ResourceMap resourceMap; 
     private javax.swing.JLabel averageTemperatureLabel;
@@ -118,38 +117,6 @@ public class DataLoggerView extends FrameView {
     @Autowired
     private ChartBuilder chartBuilder;
 
-    private static DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm") {
-        private static final long serialVersionUID = -1065659425735047652L;
-	{
-    	setLenient(false);
-    }};
-
-    private static final NumberFormat temperatureFormatter = new DecimalFormat("#0.0") {
-        private static final long serialVersionUID = 6336985835001301033L;
-	{
-    	DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
-    	decimalFormatSymbols.setDecimalSeparator('.');
-    	setDecimalFormatSymbols(decimalFormatSymbols);
-		setMaximumFractionDigits(1);
-		setMaximumIntegerDigits(2);
-    	
-    }};
-    
-
-    private static NumberFormat serialNumberFormatter = new DecimalFormat("##############0") {
-		private static final long serialVersionUID = 1568292922173869276L;
-	{
-        setMaximumFractionDigits(0);
-        setMaximumIntegerDigits(15);
-    }};
-
-    private static NumberFormat sampleIntervalFormatter = new DecimalFormat("####0") {
-		private static final long serialVersionUID = 7788525257956762L;
-	{
-		setMaximumFractionDigits(0);
-		setMaximumIntegerDigits(5);
-    }};
-    
     public DataLoggerView() {
     	super(Application.getInstance());
     }
@@ -222,6 +189,21 @@ public class DataLoggerView extends FrameView {
 
     }
     
+    private void showMessage(Throwable cause) {
+    	String message = "";
+    	if(cause instanceof DataLoggerBusinessException) {
+    		message = cause.getLocalizedMessage();
+    	} else if(cause instanceof DataLoggerException) {
+    		message = cause.getLocalizedMessage();
+        	logger.error(message, cause);
+    	} else {
+    		message = cause.getLocalizedMessage();
+        	logger.error(message, cause);
+        	message = resourceMap.getString("system.error");
+    	}
+    	this.showMessage(message);
+    }
+
     private void showMessage(String message) {
     	applicationMessageLabel.setText(message);
     	applicationMessageTimer.start();
@@ -268,11 +250,11 @@ public class DataLoggerView extends FrameView {
         configAlarmMinTemperatureLabel = new javax.swing.JLabel();
         configAlarmMaxTemperatureLabel = new javax.swing.JLabel();
         configCalibrationTemperatureLabel = new javax.swing.JLabel();
-        configSerialNumberTextField = new javax.swing.JFormattedTextField(serialNumberFormatter);
-        configSampleIntervalTextField = new javax.swing.JFormattedTextField(sampleIntervalFormatter);
-        configAlarmMinTemperatureTextField = new javax.swing.JFormattedTextField(temperatureFormatter);
-        configAlarmMaxTemperatureTextField = new javax.swing.JFormattedTextField(temperatureFormatter);
-        configCalibrationTemperatureTextField = new javax.swing.JFormattedTextField(temperatureFormatter);
+        configSerialNumberTextField = new javax.swing.JFormattedTextField(DataLoggerUtil.getViewSerialNumberformatter());
+        configSampleIntervalTextField = new javax.swing.JFormattedTextField(DataLoggerUtil.getViewSampleintervalformatter());
+        configAlarmMinTemperatureTextField = new javax.swing.JFormattedTextField(DataLoggerUtil.getViewTemperatureformatter());
+        configAlarmMaxTemperatureTextField = new javax.swing.JFormattedTextField(DataLoggerUtil.getViewTemperatureformatter());
+        configCalibrationTemperatureTextField = new javax.swing.JFormattedTextField(DataLoggerUtil.getViewTemperatureformatter());
         configButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
@@ -737,16 +719,16 @@ public class DataLoggerView extends FrameView {
         DataLoggerApp.getApplication().show(aboutBox);
     }
 
-    @Action(block = Task.BlockingScope.APPLICATION)
-    public Task<Object, Void> readData() {
-        return new ReadDataTask(getApplication());
-    }
-
     @Action
     public void configurePort() {
     	serialPortConfiguration.setPortName(this.portComboBox.getSelectedItem().toString());
     }
     
+    @Action(block = Task.BlockingScope.APPLICATION)
+    public Task<Object, Void> readData() {
+        return new ReadDataTask(getApplication());
+    }
+
     private class ReadDataTask extends org.jdesktop.application.Task<Object, Void> {
     	ReadDataTask(org.jdesktop.application.Application app) {
             super(app);
@@ -767,7 +749,7 @@ public class DataLoggerView extends FrameView {
         	dataSplitPane.setRightComponent(chartScrollPane);
         }
         @Override protected void failed(Throwable cause) {
-        	showMessage(cause.getLocalizedMessage());
+        	showMessage(cause);
         }
 
         private void clearData() {
@@ -784,13 +766,13 @@ public class DataLoggerView extends FrameView {
         }
 
         private void showData(DataLog dataLog) {
-        	serialNumberTextField.setText(serialNumberFormatter.format(dataLog.getSerialNumber()));
-        	alarmMinTemperatureTextField.setText(temperatureFormatter.format(dataLog.getAlarmMinTemperature()));
-        	alarmMaxTemperatureTextField.setText(temperatureFormatter.format(dataLog.getAlarmMaxTemperature()));
-        	initialReadTimeTextField.setText(dateFormatter.format(dataLog.getInitialReadTime()));
-        	finalReadTimeTextField.setText(dateFormatter.format(dataLog.getFinalReadTime()));
-        	averageTemperatureTextField.setText(temperatureFormatter.format(dataLog.getAverageTemperature()));
-        	standardDeviationTextField.setText(temperatureFormatter.format(dataLog.getStandardDeviation()));
+        	serialNumberTextField.setText(DataLoggerUtil.formatViewSerialNumber(dataLog.getSerialNumber()));
+        	alarmMinTemperatureTextField.setText(DataLoggerUtil.formatViewTemperature(dataLog.getAlarmMinTemperature()));
+        	alarmMaxTemperatureTextField.setText(DataLoggerUtil.formatViewTemperature(dataLog.getAlarmMaxTemperature()));
+        	initialReadTimeTextField.setText(DataLoggerUtil.formatViewDate(dataLog.getInitialReadTime()));
+        	finalReadTimeTextField.setText(DataLoggerUtil.formatViewDate(dataLog.getFinalReadTime()));
+        	averageTemperatureTextField.setText(DataLoggerUtil.formatViewTemperature(dataLog.getAverageTemperature()));
+        	standardDeviationTextField.setText(DataLoggerUtil.formatViewTemperature(dataLog.getStandardDeviation()));
         	timeUnderMinTemperatureTextField.setText(dataLog.getTimeUnderMinTemperature().toString());
         	timeAboveMaxTemperatureTextField.setText(dataLog.getTimeAboveMaxTemperature().toString());
         }
@@ -809,12 +791,13 @@ public class DataLoggerView extends FrameView {
 	    	DataLoggerConfiguration dataLoggerConfiguration = new DataLoggerConfiguration();
         	try {
 		    	dataLoggerConfiguration.setSerialNumber(new Long(configSerialNumberTextField.getText()));
-	        	dataLoggerConfiguration.setCalibrationTemperature(new BigDecimal(temperatureFormatter.parse(configCalibrationTemperatureTextField.getText()).doubleValue()));
+		    	dataLoggerConfiguration.setInitialReadTime(new Date());
+	        	dataLoggerConfiguration.setCalibrationTemperature(DataLoggerUtil.parseTemperature(configCalibrationTemperatureTextField.getText()));
 		    	dataLoggerConfiguration.setSampleInterval(new Integer(configSampleIntervalTextField.getText()));
-	        	dataLoggerConfiguration.setAlarmMinTemperature(new BigDecimal(temperatureFormatter.parse(configAlarmMinTemperatureTextField.getText()).doubleValue()));
-	        	dataLoggerConfiguration.setAlarmMaxTemperature(new BigDecimal(temperatureFormatter.parse(configAlarmMaxTemperatureTextField.getText()).doubleValue()));
+	        	dataLoggerConfiguration.setAlarmMinTemperature(DataLoggerUtil.parseTemperature(configAlarmMinTemperatureTextField.getText()));
+	        	dataLoggerConfiguration.setAlarmMaxTemperature(DataLoggerUtil.parseTemperature(configAlarmMaxTemperatureTextField.getText()));
         	} catch (Exception e) {
-        		throw new DataLoggerException("error.invalid.configuration");
+        		throw new DataLoggerBusinessException("error.invalid.configuration");
 			}
         	
         	dataLoggerBusiness.writeConfiguration(dataLoggerConfiguration);
@@ -827,7 +810,7 @@ public class DataLoggerView extends FrameView {
         	clearConfiguration();
         }
         @Override protected void failed(Throwable cause) {
-        	showMessage(cause.getLocalizedMessage());
+        	showMessage(cause);
         }
         
         private void clearConfiguration() {
@@ -869,7 +852,7 @@ public class DataLoggerView extends FrameView {
         	showMessage(resourceMap.getString("applicationMessageLabel.chart.printed"));
         }
         @Override protected void failed(Throwable cause) {
-        	showMessage(cause.getLocalizedMessage());
+        	showMessage(cause);
         }
     }
 }

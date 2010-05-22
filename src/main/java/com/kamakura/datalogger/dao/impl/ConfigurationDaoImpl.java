@@ -1,9 +1,5 @@
 package com.kamakura.datalogger.dao.impl;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,18 +11,6 @@ import com.kamakura.datalogger.util.DataLoggerUtil;
 
 @Repository
 public class ConfigurationDaoImpl implements ConfigurationDao {
-
-    private static final NumberFormat temperatureFormatter = new DecimalFormat("000.00") {
-        private static final long serialVersionUID = 6070138055311487837L;
-	{
-    	DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
-    	decimalFormatSymbols.setDecimalSeparator('.');
-    	setDecimalFormatSymbols(decimalFormatSymbols);
-    }};
-
-    private static final NumberFormat serialNumberFormatter = new DecimalFormat("000000000000000");
-
-    private static final NumberFormat sampleIntervalFormatter = new DecimalFormat("00000");
 
 	@Autowired
 	private SerialPortCommunicator serialPortCommunicator;
@@ -45,11 +29,12 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
 
 	private String configurationToData(DataLoggerConfiguration dataLoggerConfiguration) {
 		StringBuilder message = new StringBuilder();
-		message.append(serialNumberFormatter.format(dataLoggerConfiguration.getSerialNumber()));
-		message.append(sampleIntervalFormatter.format(dataLoggerConfiguration.getSampleInterval()));
-		message.append(temperatureFormatter.format(dataLoggerConfiguration.getAlarmMinTemperature().doubleValue()));
-		message.append(temperatureFormatter.format(dataLoggerConfiguration.getAlarmMaxTemperature().doubleValue()));
-		message.append(temperatureFormatter.format(dataLoggerConfiguration.getCalibrationTemperature().doubleValue()));
+		message.append(DataLoggerUtil.formatSerialNumber(dataLoggerConfiguration.getSerialNumber()));
+		message.append(DataLoggerUtil.formatDate(dataLoggerConfiguration.getInitialReadTime()));
+		message.append(DataLoggerUtil.formatSampleInterval(dataLoggerConfiguration.getSampleInterval()));
+		message.append(DataLoggerUtil.formatTemperature(dataLoggerConfiguration.getAlarmMinTemperature()));
+		message.append(DataLoggerUtil.formatTemperature(dataLoggerConfiguration.getAlarmMaxTemperature()));
+		message.append(DataLoggerUtil.formatTemperature(dataLoggerConfiguration.getCalibrationTemperature()));
 		String messageLRC = DataLoggerUtil.addLRC(message.toString()); 
 		return messageLRC;
 	}

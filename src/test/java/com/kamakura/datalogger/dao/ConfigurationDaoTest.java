@@ -3,6 +3,8 @@ package com.kamakura.datalogger.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -30,21 +32,23 @@ public class ConfigurationDaoTest {
 
 	@Test
 	public void testWriteConfiguration() {
-		
 		mockery.checking(new Expectations() {{
-            one(serialPortCommunicator).write(ConfigurationDao.START_CONFIGURE_SIGNAL + "12345678901234510000123.12456.34789.56" + (char)25 + ConfigurationDao.END_CONFIGURE_SIGNAL);
+            one(serialPortCommunicator).write(ConfigurationDao.START_CONFIGURE_SIGNAL + "1234567890123452010052216011000012.145.378.5" + (char)21 + ConfigurationDao.END_CONFIGURE_SIGNAL);
             one(serialPortCommunicator).read();
             will(returnValue(ConfigurationDao.ACK_CONFIGURE_SIGNAL));
         }});
 		
 		ReflectionTestUtils.setField(configurationDao, "serialPortCommunicator", serialPortCommunicator);
+		Calendar calendar = new GregorianCalendar();
+		calendar.set(2010, 04, 22, 16, 01);
 		
 		DataLoggerConfiguration dataLoggerConfiguration = new DataLoggerConfiguration();
 		dataLoggerConfiguration.setSerialNumber(new Long("123456789012345"))
+			.setInitialReadTime(calendar.getTime())
 			.setSampleInterval(10000)
-			.setAlarmMinTemperature(new BigDecimal("123.12"))
-			.setAlarmMaxTemperature(new BigDecimal("456.34"))
-			.setCalibrationTemperature(new BigDecimal("789.56"));
+			.setAlarmMinTemperature(new BigDecimal("12.1"))
+			.setAlarmMaxTemperature(new BigDecimal("45.3"))
+			.setCalibrationTemperature(new BigDecimal("78.5"));
 		configurationDao.writeConfiguration(dataLoggerConfiguration);
 		
 		mockery.assertIsSatisfied();
@@ -52,20 +56,22 @@ public class ConfigurationDaoTest {
 	
 	@Test
 	public void testWriteConfigurationNoAck() {
-		
 		mockery.checking(new Expectations() {{
-            one(serialPortCommunicator).write(ConfigurationDao.START_CONFIGURE_SIGNAL + "12345678901234510000123.12456.34789.56" + (char)25 + ConfigurationDao.END_CONFIGURE_SIGNAL);
+            one(serialPortCommunicator).write(ConfigurationDao.START_CONFIGURE_SIGNAL + "1234567890123452010052216011000012.145.378.5" + (char)21 + ConfigurationDao.END_CONFIGURE_SIGNAL);
             one(serialPortCommunicator).read();
         }});
 		
 		ReflectionTestUtils.setField(configurationDao, "serialPortCommunicator", serialPortCommunicator);
+		Calendar calendar = new GregorianCalendar();
+		calendar.set(2010, 04, 22, 16, 01);
 		
 		DataLoggerConfiguration dataLoggerConfiguration = new DataLoggerConfiguration();
 		dataLoggerConfiguration.setSerialNumber(new Long("123456789012345"))
+			.setInitialReadTime(calendar.getTime())
 			.setSampleInterval(10000)
-			.setAlarmMinTemperature(new BigDecimal("123.12"))
-			.setAlarmMaxTemperature(new BigDecimal("456.34"))
-			.setCalibrationTemperature(new BigDecimal("789.56"));
+			.setAlarmMinTemperature(new BigDecimal("12.1"))
+			.setAlarmMaxTemperature(new BigDecimal("45.3"))
+			.setCalibrationTemperature(new BigDecimal("78.5"));
 		
 		try {
 			configurationDao.writeConfiguration(dataLoggerConfiguration);

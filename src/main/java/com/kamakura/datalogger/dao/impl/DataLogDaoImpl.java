@@ -2,10 +2,9 @@ package com.kamakura.datalogger.dao.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,19 +31,12 @@ public class DataLogDaoImpl implements DataLogDao {
 	 * Maximum Temperature: position 4 - size (-)2.1
 	 * Calibration Temperature: position 5 - size (-)2.1
 	 * Initial Read Time: position 6 - size 12 (yyyyMMddhhmi)
-	 * Final Read Time: position 7 - size 12 (yyyyMMddhhmi)
 	 * Samples: position 8 - size variable
 	 */
-	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(\\d{12})(\\d{12})((-?\\d{2}\\.\\d{1})*))(.*)" + END_DATA_SIGNAL);
+	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(\\d{12})((-?\\d{2}\\.\\d{1})*))(.*)" + END_DATA_SIGNAL);
 
 	private static final Pattern samplesPattern = Pattern.compile("(-?\\d{2}\\.\\d{1})(.*)");
 
-	private static final DateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmm") {
-        private static final long serialVersionUID = -6034143342693900294L;
-	{
-		setLenient(false);
-	}};
-	
 	private static final Integer SCALE = 1;
 
 	@Override
@@ -59,7 +51,7 @@ public class DataLogDaoImpl implements DataLogDao {
 		    
 		    if (dataMatcher.find()) {
 		    	String fullData = dataMatcher.group(1);
-		    	char dataLrc = dataMatcher.group(11).toCharArray()[0];
+		    	char dataLrc = dataMatcher.group(10).toCharArray()[0];
 		    	
 		    	if(dataLrc != DataLoggerUtil.calculateLRC(fullData)) {
 		    		throw new DataLoggerException("error.corrupted.data");
@@ -73,20 +65,17 @@ public class DataLogDaoImpl implements DataLogDao {
 		    	dataLog.setCalibrationTemperature(new BigDecimal(dataMatcher.group(6))); 
 	
 		    	try {
-		    		dataLog.setInitialReadTime(dateFormatter.parse(dataMatcher.group(7)));
+		    		dataLog.setInitialReadTime(DataLoggerUtil.parseDate(dataMatcher.group(7)));
 		    	} catch(ParseException ex) {
 		    		throw new DataLoggerException("error.parsing.initial.date");
 		    	}
-		    	try {
-			    	dataLog.setFinalReadTime(dateFormatter.parse(dataMatcher.group(8))); 
-		    	} catch(ParseException ex) {
-		    		throw new DataLoggerException("error.parsing.final.date");
-		    	}
+		    	
+		    	dataLog.setFinalReadTime(new Date()); 
 		    	
 		    	Calendar calendar = GregorianCalendar.getInstance();
 		    	calendar.setTime(dataLog.getInitialReadTime());
 		    	
-		    	String samples = dataMatcher.group(9);
+		    	String samples = dataMatcher.group(8);
 				BigDecimal sum = new BigDecimal(0);
 		    	boolean match = false;
 		    	do {
