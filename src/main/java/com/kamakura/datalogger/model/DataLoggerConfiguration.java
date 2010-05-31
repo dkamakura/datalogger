@@ -7,8 +7,6 @@ public class DataLoggerConfiguration {
 
 	private Long serialNumber;
 	
-	private Date initialReadTime;
-
 	private BigDecimal calibrationTemperature;
 	
 	private BigDecimal alarmMinTemperature;
@@ -25,15 +23,6 @@ public class DataLoggerConfiguration {
     	this.serialNumber = serialNumber;
     	return this;
     }
-
-	public Date getInitialReadTime() {
-		return initialReadTime;
-	}
-
-	public DataLoggerConfiguration setInitialReadTime(Date initialReadTime) {
-		this.initialReadTime = initialReadTime;
-    	return this;
-	}
 
 	public BigDecimal getCalibrationTemperature() {
     	return calibrationTemperature;

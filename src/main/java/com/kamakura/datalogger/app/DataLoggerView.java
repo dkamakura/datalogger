@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -791,7 +790,6 @@ public class DataLoggerView extends FrameView {
 	    	DataLoggerConfiguration dataLoggerConfiguration = new DataLoggerConfiguration();
         	try {
 		    	dataLoggerConfiguration.setSerialNumber(new Long(configSerialNumberTextField.getText()));
-		    	dataLoggerConfiguration.setInitialReadTime(new Date());
 	        	dataLoggerConfiguration.setCalibrationTemperature(DataLoggerUtil.parseTemperature(configCalibrationTemperatureTextField.getText()));
 		    	dataLoggerConfiguration.setSampleInterval(new Integer(configSampleIntervalTextField.getText()));
 	        	dataLoggerConfiguration.setAlarmMinTemperature(DataLoggerUtil.parseTemperature(configAlarmMinTemperatureTextField.getText()));

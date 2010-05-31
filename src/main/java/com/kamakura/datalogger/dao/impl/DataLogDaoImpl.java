@@ -2,9 +2,7 @@ package com.kamakura.datalogger.dao.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,12 +28,11 @@ public class DataLogDaoImpl implements DataLogDao {
 	 * Minimum Temperature: position 3 - size (-)2.1
 	 * Maximum Temperature: position 4 - size (-)2.1
 	 * Calibration Temperature: position 5 - size (-)2.1
-	 * Initial Read Time: position 6 - size 12 (yyyyMMddhhmi)
 	 * Samples: position 8 - size variable
 	 */
-	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(\\d{12})((-?\\d{2}\\.\\d{1})*))(.*)" + END_DATA_SIGNAL);
+	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})((-?\\d{2}\\.\\d{1})*))(.*)" + END_DATA_SIGNAL);
 
-	private static final Pattern samplesPattern = Pattern.compile("(-?\\d{2}\\.\\d{1})(.*)");
+	private static final Pattern samplesPattern = Pattern.compile("(.*?)(-?\\d{2}\\.\\d{1})$");
 
 	private static final Integer SCALE = 1;
 
@@ -51,7 +48,7 @@ public class DataLogDaoImpl implements DataLogDao {
 		    
 		    if (dataMatcher.find()) {
 		    	String fullData = dataMatcher.group(1);
-		    	char dataLrc = dataMatcher.group(10).toCharArray()[0];
+		    	char dataLrc = dataMatcher.group(9).toCharArray()[0];
 		    	
 		    	if(dataLrc != DataLoggerUtil.calculateLRC(fullData)) {
 		    		throw new DataLoggerException("error.corrupted.data");
@@ -64,28 +61,21 @@ public class DataLogDaoImpl implements DataLogDao {
 		    	dataLog.setAlarmMaxTemperature(new BigDecimal(dataMatcher.group(5)));
 		    	dataLog.setCalibrationTemperature(new BigDecimal(dataMatcher.group(6))); 
 	
-		    	try {
-		    		dataLog.setInitialReadTime(DataLoggerUtil.parseDate(dataMatcher.group(7)));
-		    	} catch(ParseException ex) {
-		    		throw new DataLoggerException("error.parsing.initial.date");
-		    	}
+		    	Calendar finalReadTimeCalendar = GregorianCalendar.getInstance();
 		    	
-		    	dataLog.setFinalReadTime(new Date()); 
+		    	dataLog.setFinalReadTime(finalReadTimeCalendar.getTime()); 
 		    	
-		    	Calendar calendar = GregorianCalendar.getInstance();
-		    	calendar.setTime(dataLog.getInitialReadTime());
-		    	
-		    	String samples = dataMatcher.group(8);
-				BigDecimal sum = new BigDecimal(0);
+		    	String samples = dataMatcher.group(7);
+				BigDecimal totalTemperatureSum = new BigDecimal(0);
 		    	boolean match = false;
 		    	do {
 			    	Matcher samplesMatcher = samplesPattern.matcher(samples);
 			    	match = samplesMatcher.find();
 			    	
 			    	if(match) {
-			    		BigDecimal temperature = new BigDecimal(samplesMatcher.group(1));
-			        	dataLog.getSamples().put(calendar.getTime(), temperature);
-						sum = sum.add(temperature);
+			    		BigDecimal temperature = new BigDecimal(samplesMatcher.group(2));
+			        	dataLog.getSamples().put(finalReadTimeCalendar.getTime(), temperature);
+						totalTemperatureSum = totalTemperatureSum.add(temperature);
 						if(dataLog.getTopTemperature() == null || dataLog.getTopTemperature().compareTo(temperature) < 0 ) {
 							dataLog.setTopTemperature(temperature); 
 						}
@@ -100,13 +90,15 @@ public class DataLogDaoImpl implements DataLogDao {
 							dataLog.addTimeUnderMinTemperature(); 
 						}
 						
-			        	calendar.add(Calendar.MINUTE, dataLog.getSampleInterval());
-				    	samples = samplesMatcher.group(2);
+				    	dataLog.setInitialReadTime(finalReadTimeCalendar.getTime());
+				    	
+						finalReadTimeCalendar.add(Calendar.MINUTE, - dataLog.getSampleInterval());
+				    	samples = samplesMatcher.group(1);
 			    	}
 		    	} while(match);
 		    	
 		    	if(!dataLog.getSamples().isEmpty()) {
-					dataLog.setAverageTemperature(sum.divide(new BigDecimal(dataLog.getSamples().values().size()), SCALE, RoundingMode.HALF_UP));
+					dataLog.setAverageTemperature(totalTemperatureSum.divide(new BigDecimal(dataLog.getSamples().values().size()), SCALE, RoundingMode.HALF_UP));
 	
 					BigDecimal variance = new BigDecimal(0);
 					for(BigDecimal sample : dataLog.getSamples().values()) {

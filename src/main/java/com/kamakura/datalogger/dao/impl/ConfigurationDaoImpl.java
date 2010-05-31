@@ -30,7 +30,6 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
 	private String configurationToData(DataLoggerConfiguration dataLoggerConfiguration) {
 		StringBuilder message = new StringBuilder();
 		message.append(DataLoggerUtil.formatSerialNumber(dataLoggerConfiguration.getSerialNumber()));
-		message.append(DataLoggerUtil.formatDate(dataLoggerConfiguration.getInitialReadTime()));
 		message.append(DataLoggerUtil.formatSampleInterval(dataLoggerConfiguration.getSampleInterval()));
 		message.append(DataLoggerUtil.formatTemperature(dataLoggerConfiguration.getAlarmMinTemperature()));
 		message.append(DataLoggerUtil.formatTemperature(dataLoggerConfiguration.getAlarmMaxTemperature()));
