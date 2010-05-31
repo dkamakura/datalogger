@@ -4,6 +4,8 @@
 		<title>Datalogger</title>
 		<vendor>Kamakura's Consulting</vendor>
 		<description>Datalogger</description>
+		<icon href="icon.png"/>
+		<icon href="splash.png" kind="splash"/>
 #if($offlineAllowed)
 		<offline-allowed/>
 #end

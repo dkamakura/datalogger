@@ -28,7 +28,7 @@ public class DataLogDaoImpl implements DataLogDao {
 	 * Minimum Temperature: position 3 - size (-)2.1
 	 * Maximum Temperature: position 4 - size (-)2.1
 	 * Calibration Temperature: position 5 - size (-)2.1
-	 * Samples: position 8 - size variable
+	 * Samples: position 6 - size variable
 	 */
 	private static final Pattern dataPattern = Pattern.compile("((\\d{15})(\\d{5})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})(-?\\d{2}\\.\\d{1})((-?\\d{2}\\.\\d{1})*))(.*)" + END_DATA_SIGNAL);
 
