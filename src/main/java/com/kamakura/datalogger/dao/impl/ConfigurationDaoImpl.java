@@ -18,11 +18,11 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
 	@Override
 	public void writeConfiguration(DataLoggerConfiguration dataLoggerConfiguration) {
 
-		String message = START_CONFIGURE_SIGNAL + this.configurationToData(dataLoggerConfiguration) + END_CONFIGURE_SIGNAL;
+		String message = START_CONFIGURATION_SIGNAL + this.configurationToData(dataLoggerConfiguration) + END_CONFIGURATION_SIGNAL;
 		serialPortCommunicator.write(message);
 
 		String ack = serialPortCommunicator.read();
-		if (!ACK_CONFIGURE_SIGNAL.equals(ack)) {
+		if (!ACK_CONFIGURATION_SIGNAL.equals(ack)) {
 			throw new DataLoggerException("error.ack.configure.signal.not.found");
 		}
 	}
